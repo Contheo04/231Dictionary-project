@@ -1,3 +1,7 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 public class Trie {
 
     private TrieNode root;
@@ -101,33 +105,58 @@ public class Trie {
         return searchRecursively(word, index + 1, node.children[position]);
     }
 
+    // Load words from a dictionary file
+    public void loadDictionary(String filePath) throws FileNotFoundException {
+        File file = new File(filePath);
+        Scanner scanner = new Scanner(file);
+
+        while (scanner.hasNextLine()) {
+            String word = scanner.nextLine().trim();
+            if (!word.isEmpty()) {
+                insert(word, 0);
+            }
+        }
+
+        scanner.close();
+    }
+
+    // Update importance from a text file
+    public void updateImportanceFromFile(String filePath) throws FileNotFoundException {
+        File file = new File(filePath);
+        Scanner scanner = new Scanner(file);
+
+        while (scanner.hasNext()) {
+            String word = scanner.next().replaceAll("[^a-zA-Z]", "").toLowerCase();
+            //NOT PERMANENT BCS HES AGAINST ANYTHING JAVA RELATED FOR SOME REASON
+            if (!word.isEmpty()) {
+                updateImportance(word, 1);
+            }
+        }
+
+        scanner.close();
+    }
+
     public static void main(String[] args) {
         Trie trie = new Trie();
-        trie.insert("apple", 0);
-        trie.insert("App", 0);
-        trie.insert("ChatPattixis", 0);
 
+        // Load dictionary and importance files
+        try {
+            trie.loadDictionary("dictionary.txt");
+            trie.updateImportanceFromFile("importance.txt");
+        } catch (FileNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+        // Print words in Trie
         System.out.println("Words in Trie:");
         trie.printWords();
 
-        // Updating importance
-        trie.updateImportance("apple", 5);
-        trie.updateImportance("chatpattixis", 3);
-
-        // Printing after importance update
-        System.out.println("\nWords after updating importance:");
-        trie.printWords();
-
         // Searching for words
-        System.out.println("\nSearching for 'apple': " + trie.searchRecursively("apple")); // true
-        System.out.println("Searching for 'app': " + trie.searchRecursively("app")); // true
-        System.out.println("Searching for 'appl': " + trie.searchRecursively("appl")); // false
-        System.out.println("Searching for 'ChatPattixis': " + trie.searchRecursively("ChatPattixis")); // true
-        System.out.println("Searching for 'ban': " + trie.searchRecursively("ban")); // false
-        System.out.println("Searching for 'grape': " + trie.searchRecursively("grape")); // false
+        System.out.println("\nSearching for 'apple': " + trie.searchRecursively("apple"));
+        System.out.println("Searching for 'chatpattixis': " + trie.searchRecursively("chatpattixis"));
 
         // Importance check
-        System.out.println("\nImportance of 'apple': " + trie.getImportance("apple")); // 6
-        System.out.println("Importance of 'chatpattixis': " + trie.getImportance("chatpattixis")); // 4
+        System.out.println("\nImportance of 'apple': " + trie.getImportance("apple"));
+        System.out.println("Importance of 'chatpattixis': " + trie.getImportance("chatpattixis"));
     }
 }
