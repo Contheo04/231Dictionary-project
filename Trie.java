@@ -19,11 +19,11 @@ public class Trie {
     }
 
     // Insert a word recursively
-    public void insertRecursively(String word, int index) {
-        insertRecursively(word.toLowerCase(), index, root);
+    public void insert(String word, int index) {
+        insert(word.toLowerCase(), index, root);
     }
 
-    private void insertRecursively(String word, int index, TrieNode node) {
+    private void insert(String word, int index, TrieNode node) {
         if (index == word.length()) {
             node.wordLength = word.length();
             node.importance = 1; // Set importance for a new word
@@ -36,7 +36,7 @@ public class Trie {
             node.children[position] = new TrieNode();
         }
 
-        insertRecursively(word, index + 1, node.children[position]);
+        insert(word, index + 1, node.children[position]);
     }
 
     // Update the importance of a word
@@ -103,9 +103,9 @@ public class Trie {
 
     public static void main(String[] args) {
         Trie trie = new Trie();
-        trie.insertRecursively("apple", 0);
-        trie.insertRecursively("App", 0);
-        trie.insertRecursively("ChatPattixis", 0);
+        trie.insert("apple", 0);
+        trie.insert("App", 0);
+        trie.insert("ChatPattixis", 0);
 
         System.out.println("Words in Trie:");
         trie.printWords();
