@@ -30,7 +30,7 @@ public class Trie {
     private void insert(String word, int index, TrieNode node) {
         if (index == word.length()) {
             node.wordLength = word.length();
-            node.importance = 1; // Set importance for a new word
+            node.importance += 1; // Set importance for a new word
             return;
         }
 
@@ -41,14 +41,6 @@ public class Trie {
         }
 
         insert(word, index + 1, node.children[position]);
-    }
-
-    // Update the importance of a word
-    public void updateImportance(String word, int increment) {
-        TrieNode node = searchNode(word.toLowerCase(), root, 0);
-        if (node != null && node.wordLength > 0) {
-            node.importance += increment;
-        }
     }
 
     // Get the importance of a word
@@ -120,29 +112,16 @@ public class Trie {
         scanner.close();
     }
 
-    // Update importance from a text file
-    public void updateImportanceFromFile(String filePath) throws FileNotFoundException {
-        File file = new File(filePath);
-        Scanner scanner = new Scanner(file);
-
-        while (scanner.hasNext()) {
-            String word = scanner.next().replaceAll("[^a-zA-Z]", "").toLowerCase();
-            //NOT PERMANENT BCS HES AGAINST ANYTHING JAVA RELATED FOR SOME REASON
-            if (!word.isEmpty()) {
-                updateImportance(word, 1);
-            }
-        }
-
-        scanner.close();
-    }
+    // make a method that retrieves a text file that putss a new line every space 
 
     public static void main(String[] args) {
         Trie trie = new Trie();
 
         // Load dictionary and importance files
         try {
-            trie.loadDictionary("dictionary.txt");
-            trie.updateImportanceFromFile("importance.txt");
+            trie.loadDictionary("dictionary.txt"); // almost done
+            // text maaybe bible or something idk
+
         } catch (FileNotFoundException e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -150,6 +129,10 @@ public class Trie {
         // Print words in Trie
         System.out.println("Words in Trie:");
         trie.printWords();
+
+        trie.insert("chatpattixis", 0);
+        trie.insert("chatpattixis", 0);
+        trie.insert("chatpattixis", 0);
 
         // Searching for words
         System.out.println("\nSearching for 'apple': " + trie.searchRecursively("apple"));
