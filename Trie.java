@@ -14,11 +14,13 @@ public class Trie {
         private TrieNode[] children;
         private int wordLength;
         private int importance;
+        private int pos; // position
 
         TrieNode() {
             children = new TrieNode[26];
             wordLength = 0;
             importance = 0; // Initialize importance
+            pos = 0;
         }
     }
 
@@ -30,7 +32,6 @@ public class Trie {
     private void insert(String word, int index, TrieNode node) {
         if (index == word.length()) {
             node.wordLength = word.length();
-            node.importance += 1; // Set importance for a new word
             return;
         }
 
@@ -112,7 +113,13 @@ public class Trie {
         scanner.close();
     }
 
-    // make a method that retrieves a text file that putss a new line every space 
+    public int calcMem() {
+        int index = 0;
+        // TO-DO
+        return index;
+    }
+
+    // make a method that retrieves a text file that putss a new line every space
 
     public static void main(String[] args) {
         Trie trie = new Trie();
