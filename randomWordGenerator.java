@@ -4,7 +4,7 @@ public class randomWordGenerator {
     private static final Random random = new Random();
     private static final String ALPHABET = "abcdefghijklmnopqrstuvwwxyz";
 
-    public static String generateWordOfLength(int n) {
+    public static String generateWordOfLengthN(int n) {
         StringBuilder word = new StringBuilder(n);
         for (int i = 0; i < n; i++) {
             char letter = ALPHABET.charAt(random.nextInt(ALPHABET.length()));
@@ -20,6 +20,6 @@ public class randomWordGenerator {
 
     public static String generateWordWithLogNormalLength(double mu, double sigma) {
         int length = getLogNormalLength(mu, sigma);
-        return generateWordOfLength(length);
+        return generateWordOfLengthN(length);
     }
 }
