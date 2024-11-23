@@ -14,11 +14,13 @@ public class Trie {
         private TrieNode[] children;
         private int wordLength;
         private int importance;
+        private int pos;
 
         TrieNode() {
             children = new TrieNode[26]; // Supports only lowercase letters a-z
             wordLength = 0;
             importance = 0; // Initialize importance
+            pos = 0;
         }
     }
 
@@ -41,21 +43,18 @@ public class Trie {
 
     // Insert a word recursively
     public void insert(String word, int index) {
-        if (isWordInDictionary(word)) {
-            this.root.importance++;
-        }
         insert(word.toLowerCase(), index, root);
     }
 
     private void insert(String word, int index, TrieNode node) {
         if (index == word.length()) {
             node.wordLength = word.length();
-            node.importance++; // Increment importance for existing word
             return;
         }
 
         char c = word.charAt(index);
         int position = c - 'a';
+
         if (node.children[position] == null) {
             node.children[position] = new TrieNode();
         }
@@ -104,6 +103,9 @@ public class Trie {
 
     private boolean searchRecursively(String word, int index, TrieNode node) {
         if (index == word.length()) {
+            if (isWordInDictionary(word)) {
+                node.importance++; // Increment importance for the end node of the word
+            }
             return node != null && node.wordLength > 0;
         }
 
@@ -161,9 +163,9 @@ public class Trie {
             return 0;
         }
 
-        int memory = 26 * 4; // Size of children array (26 pointers, assuming 4 bytes each)
+        int memory = 26 * 8; // Size of children array (26 pointers, assuming 4 bytes each)
         memory += 4 + 4 + 4; // Sizes of wordLength, importance, and other fields
-        //PROXIRRA MIN ME KRAKSEIS PLS
+        // PROXIRRA MIN ME KRAKSEIS PLS
 
         for (TrieNode child : node.children) {
             memory += calcMem(child);
@@ -196,15 +198,9 @@ public class Trie {
         // Print words in Trie
         System.out.println("\nWords in Trie:");
         trie.printWords();
-
-        // Searching for words
-        System.out.println("\nSearching for 'apple': " + trie.searchRecursively("apple"));
-        System.out.println("Searching for 'banana': " + trie.searchRecursively("banana"));
-        System.out.println("Searching for 'grape': " + trie.searchRecursively("grape"));
-
-        // Importance check
-        System.out.println("\nImportance of 'apple': " + trie.getImportance("apple"));
-        System.out.println("Importance of 'banana': " + trie.getImportance("banana"));
+        System.out.println(trie.getImportance("apple"));
+        System.out.println(trie.getImportance("chatpattixis"));
+        System.out.println(trie.getImportance("yrflimmzt"));
 
         // Memory calculation
         System.out.println("\nMemory used by Trie: " + trie.calcMem() + " bytes");
