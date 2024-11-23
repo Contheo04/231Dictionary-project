@@ -165,8 +165,6 @@ public class Trie {
 
         int memory = 26 * 8; // Size of children array (26 pointers, assuming 4 bytes each)
         memory += 4 + 4 + 4; // Sizes of wordLength, importance, and other fields
-        // PROXIRRA MIN ME KRAKSEIS PLS
-
         for (TrieNode child : node.children) {
             memory += calcMem(child);
         }
