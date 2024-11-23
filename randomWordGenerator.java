@@ -30,22 +30,28 @@ public class randomWordGenerator {
         int dictionarySize = 1000; // Number of words in dictionary.txt
         int wordsSize = 500; // Number of words in words.txt
 
-        
-        double mu = 2.22; // ln(9.2)
-        double sigma = 0.05; // ln(9.7) - ln(9.2)
+        // Wider range parameters for log-normal distribution
+        double muMin = 1.5; // Minimum average word length (e.g., 4-5 characters)
+        double muMax = 3.0; // Maximum average word length (e.g., 20 characters)
+        double sigmaMin = 0.3; // Minimum variability
+        double sigmaMax = 0.7; // Maximum variability
 
         try (BufferedWriter dictionaryWriter = new BufferedWriter(new FileWriter("dictionary.txt"));
                 BufferedWriter wordsWriter = new BufferedWriter(new FileWriter("words.txt"))) {
 
-            // Generate dictionary.txt
+            // Generate dictionary.txt with variable parameters
             for (int i = 0; i < dictionarySize; i++) {
+                double mu = muMin + (muMax - muMin) * random.nextDouble(); // Randomly pick mu
+                double sigma = sigmaMin + (sigmaMax - sigmaMin) * random.nextDouble(); // Randomly pick sigma
                 String word = generateWordWithLogNormalLength(mu, sigma);
                 dictionaryWriter.write(word);
                 dictionaryWriter.newLine();
             }
 
-            // Generate words.txt
+            // Generate words.txt with variable parameters
             for (int i = 0; i < wordsSize; i++) {
+                double mu = muMin + (muMax - muMin) * random.nextDouble(); // Randomly pick mu
+                double sigma = sigmaMin + (sigmaMax - sigmaMin) * random.nextDouble(); // Randomly pick sigma
                 String word = generateWordWithLogNormalLength(mu, sigma);
                 wordsWriter.write(word);
                 wordsWriter.newLine();
