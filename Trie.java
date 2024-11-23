@@ -14,13 +14,11 @@ public class Trie {
         private TrieNode[] children;
         private int wordLength;
         private int importance;
-        private int pos;
 
         TrieNode() {
             children = new TrieNode[26]; // Supports only lowercase letters a-z
             wordLength = 0;
             importance = 0; // Initialize importance
-            pos = 0;
         }
     }
 
@@ -164,7 +162,7 @@ public class Trie {
         }
 
         int memory = 26 * 8; // Size of children array (26 pointers, assuming 4 bytes each)
-        memory += 4 + 4 + 4; // Sizes of wordLength, importance, and other fields
+        memory += 4 + 4 + 4; // Sizes of wordLength, importance, and one more so it matches up with robinhood
         for (TrieNode child : node.children) {
             memory += calcMem(child);
         }
