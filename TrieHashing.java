@@ -1,3 +1,7 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 public class TrieHashing {
 
     private TrieNode root; // The root of the TrieHashing structure
@@ -10,10 +14,12 @@ public class TrieHashing {
     public class TrieNode {
         private RobinHoodHashing children; // RobinHoodHashing structure for storing child nodes
         private int wordLength; // Indicates if this node represents a complete word
+        private int importance;
 
         public TrieNode() {
             this.children = new RobinHoodHashing(); // Initializing RobinHoodHashing for child nodes
             this.wordLength = 0; // Default to 0, indicating no complete word
+            this.importance = 0;
         }
     }
 
@@ -165,6 +171,9 @@ public class TrieHashing {
 
     private boolean searchRecursively(String word, int index, TrieNode node) {
         if (index == word.length()) {
+            if (node.wordLength > 0) {
+                node.importance++; // Increment importance for the word
+            }
             return node.wordLength > 0; // Only return true if the node represents a complete word
         }
 
@@ -322,14 +331,122 @@ public class TrieHashing {
         trieHashing.printWords();
     }
 
+    public int calcMem() {
+        return calcMem(root);
+    }
+
+    private int calcMem(TrieNode node) {
+        if (node == null) {
+            return 0;
+        }
+
+        // Memory for the current TrieNode:
+        int memory = 4; // wordLength (4 bytes)
+
+        // Add memory used by the Robin Hood Hashing structure
+        memory += calcRobinHoodMem(node.children);
+
+        // Recursively calculate memory for child nodes
+        for (char c = 'a'; c <= 'z'; c++) {
+            TrieNode child = node.children.search(c);
+            if (child != null) {
+                memory += calcMem(child);
+            }
+        }
+
+        return memory;
+    }
+
+    private int calcRobinHoodMem(RobinHoodHashing robinHoodHashing) {
+        if (robinHoodHashing == null || robinHoodHashing.table == null) {
+            return 0;
+        }
+
+        int memory = 0;
+
+        // Memory for the hash table and metadata
+        memory += robinHoodHashing.capacity * 12; // Each entry: 1 char (2 bytes) + 1 TrieNode (8 bytes) + probeLength
+                                                  // (4 bytes)
+        memory += 12; // RobinHoodHashing metadata (capacity, size, maxProbeLength)
+
+        return memory;
+    }
+
+    private TrieNode searchNode(String word, TrieNode node, int index) {
+        if (node == null || index == word.length()) {
+            return node;
+        }
+
+        char c = word.charAt(index);
+        TrieNode child = node.children.search(c);
+        return searchNode(word, child, index + 1);
+    }
+
+    public void importanceUpdate(File wordsFile) {
+        try (Scanner scanner = new Scanner(wordsFile)) {
+            while (scanner.hasNextLine()) {
+                String word = scanner.nextLine().trim().toLowerCase();
+                if (!word.isEmpty()) {
+                    TrieNode node = searchNode(word, root, 0);
+                    if (node != null && node.wordLength > 0) {
+                        node.importance++; // Increment importance for the word
+                        System.out.println("Importance updated for word: " + word);
+                    } else {
+                        System.out.println("Word not found in Trie: " + word);
+                    }
+                }
+            }
+            System.out.println("Importance update complete.");
+        } catch (FileNotFoundException e) {
+            System.out.println("Error: File not found - " + wordsFile.getName());
+        } catch (Exception e) {
+            System.out.println("Error processing file: " + e.getMessage());
+        }
+    }
+
+    public int getImportance(String word) {
+        TrieNode node = searchNode(word.toLowerCase(), root, 0);
+        return (node != null && node.wordLength > 0) ? node.importance : 0;
+    }
+
+    public void loadFile(String filePath) {
+        File file = new File(filePath);
+
+        try (Scanner scanner = new Scanner(file)) {
+            while (scanner.hasNextLine()) {
+                String word = scanner.nextLine().trim().toLowerCase();
+                if (!word.isEmpty()) {
+                    insertRecursively(word, 0); // Insert each word into the Trie
+                }
+            }
+            System.out.println("Loaded words from file: " + filePath);
+        } catch (FileNotFoundException e) {
+            System.out.println("Error: File not found - " + filePath);
+        } catch (Exception e) {
+            System.out.println("Error processing file: " + e.getMessage());
+        }
+    }
+
     public static void main(String[] args) {
-        testInsertWords();
-        testSearchWords();
-        testRehashDuringInsertRecursively();
-        testPrintWords();
-        testSearchNonExistentWords();
-        testComprehensive();
-        testInsert19Words();
+        TrieHashing trieHashing = new TrieHashing();
+
+        // Load words into the Trie from a dictionary file
+        trieHashing.loadFile("dictionary.txt");
+
+        // Update importance for words found in a separate file
+        File wordsFile = new File("words.txt");
+        trieHashing.importanceUpdate(wordsFile);
+
+        // Print all words in the Trie
+        System.out.println("\nWords in Trie:");
+        trieHashing.printWords();
+
+        // Test importance retrieval
+        System.out.println("\nImportance of 'apple': " + trieHashing.getImportance("apple"));
+        System.out.println("Importance of 'chatpattixis': " + trieHashing.getImportance("chatpattixis"));
+
+        // Memory usage calculation
+        System.out.println("\nMemory used by Trie: " + trieHashing.calcMem() + " bytes");
     }
 
 }
