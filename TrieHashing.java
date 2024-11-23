@@ -5,6 +5,7 @@ import java.util.Scanner;
 public class TrieHashing {
 
     private TrieNode root; // The root of the TrieHashing structure
+    private static int numOfWords = 0;
 
     public TrieHashing() {
         this.root = new TrieNode();
@@ -416,6 +417,7 @@ public class TrieHashing {
             while (scanner.hasNextLine()) {
                 String word = scanner.nextLine().trim().toLowerCase();
                 if (!word.isEmpty()) {
+                    numOfWords++;
                     insertRecursively(word, 0); // Insert each word into the Trie
                 }
             }
@@ -446,7 +448,7 @@ public class TrieHashing {
         System.out.println("Importance of 'chatpattixis': " + trieHashing.getImportance("chatpattixis"));
 
         // Memory usage calculation
-        System.out.println("\nMemory used by Trie: " + trieHashing.calcMem() + " bytes");
+        System.out.println("\nNumbers found in dictionary " + numOfWords + " Memory used by Trie: " + trieHashing.calcMem() + " bytes");
     }
 
 }
