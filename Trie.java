@@ -41,9 +41,8 @@ public class Trie {
 
     // Insert a word recursively
     public void insert(String word, int index) {
-        if (!isWordInDictionary(word)) {
-            System.out.println("The word \"" + word + "\" is not in the dictionary file and won't be inserted.");
-            return;
+        if (isWordInDictionary(word)) {
+            this.root.importance++;
         }
         insert(word.toLowerCase(), index, root);
     }
