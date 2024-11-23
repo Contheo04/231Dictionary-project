@@ -4,6 +4,8 @@ import java.util.Scanner;
 
 public class Trie {
 
+    static int numOfWords = 0;
+
     private TrieNode root;
 
     public Trie() {
@@ -20,23 +22,6 @@ public class Trie {
             wordLength = 0;
             importance = 0; // Initialize importance
         }
-    }
-
-    private boolean isWordInDictionary(String word) {
-        File dictionaryFile = new File("dictionary.txt"); // Replace with your dictionary file path
-
-        try (Scanner scanner = new Scanner(dictionaryFile)) {
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine().trim();
-                if (line.equalsIgnoreCase(word)) {
-                    return true;
-                }
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println("Error: Dictionary file not found.");
-        }
-
-        return false; // Return false if the word was not found
     }
 
     // Insert a word recursively
@@ -101,9 +86,6 @@ public class Trie {
 
     private boolean searchRecursively(String word, int index, TrieNode node) {
         if (index == word.length()) {
-            if (isWordInDictionary(word)) {
-                node.importance++; // Increment importance for the end node of the word
-            }
             return node != null && node.wordLength > 0;
         }
 
@@ -131,24 +113,42 @@ public class Trie {
         }
     }
 
-    // Load words from a dictionary file
+    // Update importance based on words in a file
+    public void importanceUpdate(File wordsFile) {
+        try (Scanner scanner = new Scanner(wordsFile)) {
+            while (scanner.hasNextLine()) {
+                String word = scanner.nextLine().trim().toLowerCase(); // Normalize to lowercase
+                if (!word.isEmpty()) {
+                    TrieNode node = searchNode(word, root, 0);
+                    if (node != null && node.wordLength > 0) {
+                        node.importance++; // Increment importance for the word if it exists in the Trie
+                        System.out.println("Importance updated for word: " + word);
+                    } else {
+                        System.out.println("Word not found in Trie: " + word);
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Error: Words file not found.");
+        }
+    }
+
+    // Load words from a file into the Trie
     public void loadFile(String filePath) {
         File file = new File(filePath);
 
         try (Scanner scanner = new Scanner(file)) {
             while (scanner.hasNextLine()) {
-                // Read each line as a word
                 String word = scanner.nextLine().trim();
 
                 // Normalize word (convert to lowercase, ignore empty lines)
                 if (!word.isEmpty()) {
                     insert(word.toLowerCase(), 0);
+                    numOfWords++;
                 }
             }
         } catch (FileNotFoundException e) {
             System.out.println("Error: File not found - " + filePath);
-        } catch (Exception e) {
-            System.out.println("Error processing file: " + e.getMessage());
         }
     }
 
@@ -162,7 +162,7 @@ public class Trie {
         }
 
         int memory = 26 * 8; // Size of children array (26 pointers, assuming 4 bytes each)
-        memory += 4 + 4 + 4; // Sizes of wordLength, importance, and one more so it matches up with robinhood
+        memory += 4 + 4 + 4; // Sizes of wordLength, importance, and other metadata
         for (TrieNode child : node.children) {
             memory += calcMem(child);
         }
@@ -173,33 +173,32 @@ public class Trie {
     public static void main(String[] args) {
         Trie trie = new Trie();
 
-        // Load dictionary file
+        // Load dictionary file into Trie
         trie.loadFile("dictionary.txt");
 
-        // Read and check/insert words from Words.txt
-        File wordsFile = new File("Words.txt");
-        try (Scanner scanner = new Scanner(wordsFile)) {
-            while (scanner.hasNextLine()) {
-                String word = scanner.nextLine().trim();
-                if (!word.isEmpty()) {
-                    trie.checkAndInsert(word);
-                }
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println("Error: Words file not found.");
-        } catch (Exception e) {
-            System.out.println("Error processing Words file: " + e.getMessage());
-        }
-
-        // Print words in Trie
-        System.out.println("\nWords in Trie:");
-        trie.printWords();
-        System.out.println(trie.getImportance("apple"));
-        System.out.println(trie.getImportance("chatpattixis"));
-        System.out.println(trie.getImportance("yrflimmzt"));
+        // Update importance for words in Words.txt
+        // for experiment COMMENT THIS SHIT PLEASE >:(
+        
+        /*
+         * File wordsFile = new File("words.txt");
+         * 
+         * trie.importanceUpdate(wordsFile);
+         * 
+         * // Print words and their importance
+         * System.out.println("\nWords in Trie:");
+         * trie.printWords();
+         * 
+         * // Test importance retrieval
+         * System.out.println("\nImportance of 'apple': " +
+         * trie.getImportance("apple"));
+         * System.out.println("Importance of 'banana': " +
+         * trie.getImportance("banana"));
+         * System.out.println("Importance of 'chatpattixis': " +
+         * trie.getImportance("chatpattixis"));
+         */
 
         // Memory calculation
-        System.out.println("\nMemory used by Trie: " + trie.calcMem() + " bytes");
-    }
+        System.out.println("\nNumbers found in dictionary " + numOfWords + " Memory used by Trie: " + trie.calcMem() + " bytes");
 
+    }
 }

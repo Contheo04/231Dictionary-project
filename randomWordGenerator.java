@@ -27,7 +27,7 @@ public class randomWordGenerator {
     }
 
     public static void main(String[] args) {
-        int dictionarySize = 1000; // Number of words in dictionary.txt
+        int dictionarySize = 1000; // Number of words in dictionary.txt USE FOR GRAPH
         int wordsSize = 500; // Number of words in words.txt
 
         // Wider range parameters for log-normal distribution

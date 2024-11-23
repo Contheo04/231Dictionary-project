@@ -44,20 +44,24 @@ public class TrieHashing {
         }
 
         private int hash(char key) {
-            return key % capacity; // Hash function based on the ASCII value of the character modulo with the capacity
+            return key % capacity; // Hash function based on the ASCII value of the character modulo with the
+                                   // capacity
         }
 
         private void rehash() {
-        	// for debug purposes
-        	System.out.println("Rehash triggered! Current capacity: " + capacity + ", Current size: " + size);
-        	
+            // for debug purposes
+            System.out.println("Rehash triggered! Current capacity: " + capacity + ", Current size: " + size);
+
             // Save the old table
             Element[] oldTable = table;
 
-            //Update the capacity based on the current
-            if (capacity == 5) capacity = 11;
-            else if (capacity == 11) capacity = 19;
-            else if (capacity == 19) capacity = 29;
+            // Update the capacity based on the current
+            if (capacity == 5)
+                capacity = 11;
+            else if (capacity == 11)
+                capacity = 19;
+            else if (capacity == 19)
+                capacity = 29;
 
             // Create a new hash table with the updated capacity
             table = new Element[capacity];
@@ -70,7 +74,7 @@ public class TrieHashing {
                     insert(e.key, e.trieNode); // Rehash and reinsert elements
                 }
             }
-            //for debug purposes
+            // for debug purposes
             System.out.println("Rehash completed! New capacity: " + capacity);
         }
 
@@ -85,7 +89,7 @@ public class TrieHashing {
 
             while (table[index] != null) {
                 Element current = table[index];
-                //Robin Hood technique to check the current probe with all the other probes
+                // Robin Hood technique to check the current probe with all the other probes
                 if (current.probeLength < probe) {
                     table[index] = newElement; // if the if statement is correct switch the elements
                     newElement = current;
@@ -97,7 +101,7 @@ public class TrieHashing {
             table[index] = newElement;
             newElement.probeLength = probe;
             size++;
-            maxProbeLength = Math.max(maxProbeLength, probe); //initialize the maxProbeLength of the current element
+            maxProbeLength = Math.max(maxProbeLength, probe); // initialize the maxProbeLength of the current element
         }
 
         public TrieNode search(char key) {
@@ -110,7 +114,8 @@ public class TrieHashing {
                 }
                 index = (index + 1) % capacity;
                 probe++;
-                if (probe > maxProbeLength) break; //early break if the probe is greater than the max probe
+                if (probe > maxProbeLength)
+                    break; // early break if the probe is greater than the max probe
             }
 
             return null;
@@ -171,7 +176,7 @@ public class TrieHashing {
 
         return searchRecursively(word, index + 1, child);
     }
-    
+
     public static void testInsertWords() {
         TrieHashing trieHashing = new TrieHashing();
 
@@ -218,7 +223,7 @@ public class TrieHashing {
         trieHashing.insertRecursively("banana", 0);
         trieHashing.insertRecursively("cherry", 0);
         trieHashing.insertRecursively("date", 0);
-        trieHashing.insertRecursively("elderberry", 0); 
+        trieHashing.insertRecursively("elderberry", 0);
         trieHashing.insertRecursively("word", 0);
 
         System.out.println("Words inserted. Checking if all words are accessible:");
@@ -276,9 +281,7 @@ public class TrieHashing {
         trieHashing.insertRecursively("banana", 0);
         trieHashing.insertRecursively("cherry", 0);
         trieHashing.insertRecursively("date", 0);
-        trieHashing.insertRecursively("elderberry", 0); 
-        
-
+        trieHashing.insertRecursively("elderberry", 0);
 
         // Verify words
         System.out.println("Search for 'apple': " + trieHashing.searchRecursively("apple"));
@@ -290,7 +293,7 @@ public class TrieHashing {
         System.out.println("\nWords in TrieHashing:");
         trieHashing.printWords();
     }
-    
+
     public static void testInsert19Words() {
         TrieHashing trieHashing = new TrieHashing();
 
@@ -298,10 +301,10 @@ public class TrieHashing {
 
         // Insert 19 words to trigger multiple rehashes
         String[] words = {
-            "apple", "banana", "cherry", "date", "elderberry",
-            "fig", "grape", "honeydew", "kiwi", "lemon",
-            "mango", "nectarine", "orange", "papaya", "quince",
-            "raspberry", "strawberry", "tangerine", "watermelon"
+                "apple", "banana", "cherry", "date", "elderberry",
+                "fig", "grape", "honeydew", "kiwi", "lemon",
+                "mango", "nectarine", "orange", "papaya", "quince",
+                "raspberry", "strawberry", "tangerine", "watermelon"
         };
 
         for (String word : words) {
@@ -318,7 +321,6 @@ public class TrieHashing {
         System.out.println("\nPrinting all words in TrieHashing:");
         trieHashing.printWords();
     }
-
 
     public static void main(String[] args) {
         testInsertWords();
