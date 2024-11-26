@@ -1,6 +1,7 @@
 package test3;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
@@ -389,7 +390,31 @@ public class TrieApp {
     }
 
     public void importanceUpdate(File wordsFile) {
-        try (Scanner scanner = new Scanner(wordsFile)) {
+        try {
+            // Read the entire content of the file
+            Scanner scanner = new Scanner(wordsFile);
+            StringBuilder content = new StringBuilder();
+
+            while (scanner.hasNextLine()) {
+                content.append(scanner.nextLine()).append(" ");
+            }
+            scanner.close();
+
+            // Split the content into potential words
+            String[] words = content.toString().split("\\s+");
+
+            // Write the processed words back to the same file
+            try (PrintWriter writer = new PrintWriter(wordsFile)) {
+                for (String word : words) {
+                    String processedWord = processWord(word); // Process the word based on rules
+                    if (processedWord != null && !processedWord.isEmpty()) {
+                        writer.println(processedWord);
+                    }
+                }
+            }
+
+            // Update importance for the reformatted file
+            scanner = new Scanner(wordsFile);
             while (scanner.hasNextLine()) {
                 String word = scanner.nextLine().trim().toLowerCase();
                 if (!word.isEmpty()) {
@@ -399,12 +424,31 @@ public class TrieApp {
                     }
                 }
             }
+            scanner.close();
         } catch (FileNotFoundException e) {
             System.out.println("Error: File not found - " + wordsFile.getName());
         } catch (Exception e) {
             System.out.println("Error processing file: " + e.getMessage());
         }
     }
+
+    // Helper method to process each word based on the given rules
+    private String processWord(String word) {
+        if (word.matches(".*[a-zA-Z][^a-zA-Z]+[a-zA-Z].*")) {
+            // Rule 1: Discard words with special characters interspersed with letters
+            return null;
+        } else if (word.matches(".*[^a-zA-Z]+$")) {
+            // Rule 2: Trim trailing special characters (e.g., BS!!!! becomes BS)
+            return word.replaceAll("[^a-zA-Z]+$", "");
+        } else if (word.matches("[a-zA-Z]+")) {
+            // Rule 3: Retain pure alphabetic words
+            return word;
+        } else {
+            // Default: Discard anything else
+            return null;
+        }
+    }
+
 
     private TrieNode searchNode(String word, TrieNode node, int index) {
         if (node == null || index == word.length()) {
@@ -424,7 +468,7 @@ public class TrieApp {
 
         String dictionaryFilePath = args[0];
         String wordsFilePath = args[1];
-
+        
         TrieApp trie = new TrieApp();
 
         trie.loadFile(dictionaryFilePath); // Load dictionary
