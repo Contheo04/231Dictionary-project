@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class TrieApp {
 
-    private TrieNode root; // The root of the TrieHashing structure
+    private TrieNode root; // The root of the Trie structure
 
     public TrieApp() {
         this.root = new TrieNode();
@@ -52,15 +52,13 @@ public class TrieApp {
         }
 
         private int hash(char key) {
-            return key % capacity; // Hash function based on the ASCII value of the character modulo with the
-                                   // capacity
+            return key % capacity; // Hash function based on the ASCII value of the character modulo the capacity
         }
 
         private void rehash() {
-
             Element[] oldTable = table;
 
-            // Update the capacity based on the current
+            // Update the capacity
             if (capacity == 5)
                 capacity = 11;
             else if (capacity == 11)
@@ -79,11 +77,10 @@ public class TrieApp {
                     insert(e.key, e.trieNode); // Rehash and reinsert elements
                 }
             }
-    
         }
 
         public void insert(char key, TrieNode trieNode) {
-            if (size > 0.9 * capacity) { // If the size surpasses the 90% of the capacity rehash
+            if (size > 0.9 * capacity) { // If size surpasses 90% of capacity, rehash
                 rehash();
             }
 
@@ -95,7 +92,7 @@ public class TrieApp {
                 Element current = table[index];
                 // Robin Hood technique to check the current probe with all the other probes
                 if (current.probeLength < probe) {
-                    table[index] = newElement; // if the if statement is correct switch the elements
+                    table[index] = newElement; // Switch elements
                     newElement = current;
                 }
                 index = (index + 1) % capacity;
@@ -105,7 +102,7 @@ public class TrieApp {
             table[index] = newElement;
             newElement.probeLength = probe;
             size++;
-            maxProbeLength = Math.max(maxProbeLength, probe); // initialize the maxProbeLength of the current element
+            maxProbeLength = Math.max(maxProbeLength, probe);
         }
 
         public TrieNode search(char key) {
@@ -119,7 +116,7 @@ public class TrieApp {
                 index = (index + 1) % capacity;
                 probe++;
                 if (probe > maxProbeLength)
-                    break; // early break if the probe is greater than the max probe
+                    break; // Early break if the probe exceeds the max probe length
             }
 
             return null;
@@ -164,26 +161,34 @@ public class TrieApp {
         }
 
         public void insert(String word, int wordImportance) {
-            if (size == capacity) {
-                // Replace root if the new importance is greater
+            if (contains(word)) {
+                return; // Skip duplicates
+            }
+
+            if (size < capacity) {
+                // Insert the new word if the heap is not full
+                heap[size] = word;
+                importance[size] = wordImportance;
+                int current = size++;
+
+                // Restore heap property (percolate up)
+                while (current > 0 && importance[current] < importance[parent(current)]) {
+                    swap(current, parent(current));
+                    current = parent(current);
+                }
+            } else {
+                // If the heap is full, compare with the root (minimum)
                 if (wordImportance > importance[0]) {
-                    removeMin();
-                } else {
-                    return;
+                    heap[0] = word; // Replace the root
+                    importance[0] = wordImportance;
+
+                    // Restore heap property (heapify down)
+                    heapify(0);
                 }
             }
-
-            // Insert new element at the end
-            heap[size] = word;
-            importance[size] = wordImportance;
-            int current = size++;
-
-            // Restore heap property
-            while (current > 0 && importance[current] < importance[parent(current)]) {
-                swap(current, parent(current));
-                current = parent(current);
-            }
         }
+
+
 
         public String removeMin() {
             if (size == 0) {
@@ -202,7 +207,7 @@ public class TrieApp {
             return rootWord;
         }
 
-        private void heapify(int i) {
+        private void heapify(int i) { //known as percolate downs
             int left = leftChild(i);
             int right = rightChild(i);
             int smallest = i;
@@ -229,67 +234,13 @@ public class TrieApp {
             return result;
         }
 
-        public boolean isEmpty() {
-            return size == 0;
-        }
-
-        public int getSize() {
-            return size;
-        }
-    }
-    
-    public class DynamicArray {
-        private String[] words;
-        private int[] importances;
-        private int size; // Number of elements currently in the array
-        private int capacity; // Current maximum capacity of the array
-
-        public DynamicArray() {
-            this.capacity = 10; // Initial capacity
-            this.size = 0;
-            this.words = new String[capacity];
-            this.importances = new int[capacity];
-        }
-
-        public void add(String word, int importance) {
-            if (size == capacity) {
-                resize();
-            }
-            words[size] = word;
-            importances[size] = importance;
-            size++;
-        }
-
-        private void resize() {
-            capacity *= 2;
-            String[] newWords = new String[capacity];
-            int[] newImportances = new int[capacity];
-
+        private boolean contains(String word) {
             for (int i = 0; i < size; i++) {
-                newWords[i] = words[i];
-                newImportances[i] = importances[i];
+                if (heap[i].equals(word)) {
+                    return true; // Word already exists in the heap
+                }
             }
-
-            words = newWords;
-            importances = newImportances;
-        }
-
-        public String getWord(int index) {
-            if (index < 0 || index >= size) {
-                throw new IndexOutOfBoundsException("Invalid index");
-            }
-            return words[index];
-        }
-
-        public int getImportance(int index) {
-            if (index < 0 || index >= size) {
-                throw new IndexOutOfBoundsException("Invalid index");
-            }
-            return importances[index];
-        }
-
-        public int getSize() {
-            return size;
+            return false; // Word not found
         }
     }
 
@@ -314,77 +265,6 @@ public class TrieApp {
         insertRecursively(word, index + 1, child);
     }
 
-    public void printWords() {
-        printWords(root, "");
-    }
-
-    private void printWords(TrieNode node, String prefix) {
-        if (node.wordLength > 0) {
-            System.out.println(prefix);
-        }
-
-        for (char c = 'a'; c <= 'z'; c++) {
-            TrieNode child = node.children.search(c);
-            if (child != null) {
-                printWords(child, prefix + c);
-            }
-        }
-    }
-
-    public boolean searchRecursively(String word) {
-        return searchRecursively(word.toLowerCase(), 0, root);
-    }
-
-    private boolean searchRecursively(String word, int index, TrieNode node) {
-        if (index == word.length()) {
-            if (node.wordLength > 0) {
-                node.importance++; // Increment importance for the word
-            }
-            return node.wordLength > 0; // Only return true if the node represents a complete word
-        }
-
-        char c = word.charAt(index);
-        TrieNode child = node.children.search(c);
-        if (child == null) {
-            return false; // If the character does not exist, the word is not in the Trie
-        }
-
-        return searchRecursively(word, index + 1, child);
-    }
-   private TrieNode searchNode(String word, TrieNode node, int index) {
-        if (node == null || index == word.length()) {
-            return node;
-        }
-
-        char c = word.charAt(index);
-        TrieNode child = node.children.search(c);
-        return searchNode(word, child, index + 1);
-    }
-
-    public void importanceUpdate(File wordsFile) {
-        try (Scanner scanner = new Scanner(wordsFile)) {
-            while (scanner.hasNextLine()) {
-                String word = scanner.nextLine().trim().toLowerCase();
-                if (!word.isEmpty()) {
-                    TrieNode node = searchNode(word, root, 0);
-                    if (node != null && node.wordLength > 0) {
-                        node.importance++; // Increment importance for the word
-                    } 
-                }
-            }
-            
-        } catch (FileNotFoundException e) {
-            System.out.println("Error: File not found - " + wordsFile.getName());
-        } catch (Exception e) {
-            System.out.println("Error processing file: " + e.getMessage());
-        }
-    }
-
-    public int getImportance(String word) {
-        TrieNode node = searchNode(word.toLowerCase(), root, 0);
-        return (node != null && node.wordLength > 0) ? node.importance : 0;
-    }
-
     public void loadFile(String filePath) {
         File file = new File(filePath);
 
@@ -401,150 +281,140 @@ public class TrieApp {
             System.out.println("Error processing file: " + e.getMessage());
         }
     }
-    
-    private void collectWords(TrieNode node, String currentWord, DynamicArray results) {
+
+    public MinHeap findTopKWords(String word, int k) {
+        // Use a MinHeap to store the top k words
+        MinHeap heap = new MinHeap(k);
+
+        // Collect words by prefix
+        collectWordsByPrefix(root, "", word, heap);
+
+        // Collect words by exact length
+        collectWordsByExactLength(root, "", word.length(), heap);
+
+        // Collect words by approximate length
+        collectWordsByApproximateLength(root, "", word, heap);
+
+        return heap; // Return the MinHeap containing the top k words
+    }
+
+    private void collectWordsByPrefix(TrieNode node, String currentWord, String searchPrefix, MinHeap heap) {
         if (node == null) return;
 
-        // Add only if this node marks a complete word
-        if (node.wordLength > 0) { 
-            results.add(currentWord, node.importance);
+        // If the current word starts with the search prefix, add it to the heap
+        if (currentWord.startsWith(searchPrefix) && node.wordLength > 0) {
+            heap.insert(currentWord, node.importance);
         }
 
         // Traverse all child nodes
         for (char c = 'a'; c <= 'z'; c++) {
             TrieNode child = node.children.search(c);
             if (child != null) {
-                collectWords(child, currentWord + c, results);
-            }
-        }
-    }
-    
-    public DynamicArray searchByPrefix(String prefix) {
-        TrieNode prefixNode = searchNode(prefix, root, 0);
-        DynamicArray results = new DynamicArray();
-
-        if (prefixNode == null) {
-            return results; // Return empty results if prefix does not exist
-        }
-
-        // Collect only valid dictionary words starting with this prefix
-        collectWords(prefixNode, prefix, results);
-        return results;
-    }
-
-    
- // Method to search for words with the exact specified length
-    public DynamicArray searchByExactLength(int length) {
-        DynamicArray result = new DynamicArray(); // Store matching words and their importance
-        searchByExactLengthHelper(root, "", length, result); // Recursive helper
-        return result;
-    }
-
-    private void searchByExactLengthHelper(TrieNode node, String prefix, int targetLength, DynamicArray result) {
-        if (node == null) return;
-
-        // Add only if this node marks a complete word and the length matches
-        if (node.wordLength > 0 && prefix.length() == targetLength) {
-            result.add(prefix, node.importance);
-        }
-
-        // Traverse all child nodes
-        for (char c = 'a'; c <= 'z'; c++) {
-            TrieNode child = node.children.search(c);
-            if (child != null) {
-                searchByExactLengthHelper(child, prefix + c, targetLength, result);
+                collectWordsByPrefix(child, currentWord + c, searchPrefix, heap);
             }
         }
     }
 
-    public DynamicArray approximateLengthSearch(String word) {
-        DynamicArray results = new DynamicArray();
-        approximateLengthSearchHelper(root, "", word, results);
-        return results;
-    }
-
-    private void approximateLengthSearchHelper(TrieNode node, String currentWord, String targetWord, DynamicArray results) {
+    private void collectWordsByExactLength(TrieNode node, String currentWord, int targetLength, MinHeap heap) {
         if (node == null) return;
 
-        // Check if this is a complete word and matches the length criteria
-        int lengthDifference = currentWord.length() - targetWord.length();
-        if (node.wordLength > 0 && (lengthDifference == 2 || lengthDifference == -1) && isSimilar(currentWord, targetWord)) {
-            results.add(currentWord, node.importance);
+        // If this is a complete word and its length matches, add it to the heap
+        if (node.wordLength > 0 && currentWord.length() == targetLength) {
+            heap.insert(currentWord, node.importance);
         }
 
         // Traverse all child nodes
         for (char c = 'a'; c <= 'z'; c++) {
             TrieNode child = node.children.search(c);
             if (child != null) {
-                approximateLengthSearchHelper(child, currentWord + c, targetWord, results);
+                collectWordsByExactLength(child, currentWord + c, targetLength, heap);
+            }
+        }
+    }
+
+    private void collectWordsByApproximateLength(TrieNode node, String currentWord, String targetWord, MinHeap heap) {
+        if (node == null) return;
+
+        // Check if the current word matches the approximate length criteria
+        int lengthDifference = Math.abs(currentWord.length() - targetWord.length());
+        if (node.wordLength > 0 && lengthDifference <= 2 && isSimilar(currentWord, targetWord)) {
+            heap.insert(currentWord, node.importance);
+        }
+
+        // Traverse all child nodes
+        for (char c = 'a'; c <= 'z'; c++) {
+            TrieNode child = node.children.search(c);
+            if (child != null) {
+                collectWordsByApproximateLength(child, currentWord + c, targetWord, heap);
             }
         }
     }
 
     private boolean isSimilar(String trieWord, String targetWord) {
-        int[] trieFreq = new int[26];
-        int[] targetFreq = new int[26];
+        int len1 = trieWord.length();
+        int len2 = targetWord.length();
 
-        for (char c : trieWord.toCharArray()) {
-            trieFreq[c - 'a']++;
+        // Only allow specific length differences
+        if (len1 != len2 - 1 && len1 != len2 && len1 != len2 + 2) {
+            return false;
         }
 
-        for (char c : targetWord.toCharArray()) {
-            targetFreq[c - 'a']++;
+        // Check character mismatches
+        int mismatchCount = 0;
+        int i = 0, j = 0;
+
+        while (i < len1 && j < len2) {
+            if (trieWord.charAt(i) != targetWord.charAt(j)) {
+                mismatchCount++;
+                if (mismatchCount > 2) return false; // Allow up to 2 mismatches
+
+                // Adjust indices for added/removed characters
+                if (len1 > len2) {
+                    i++; // Extra character in trieWord
+                } else if (len1 < len2) {
+                    j++; // Extra character in targetWord
+                } else {
+                    i++;
+                    j++;
+                }
+            } else {
+                i++;
+                j++;
+            }
         }
 
-        int mismatch = 0;
-        for (int i = 0; i < 26; i++) {
-            mismatch += Math.abs(trieFreq[i] - targetFreq[i]);
-        }
-
-        return mismatch <= 2; // Allowable mismatch threshold
+        // Account for any trailing characters
+        mismatchCount += (len1 - i) + (len2 - j);
+        return mismatchCount <= 2;
     }
 
-    private void mergeResults(DynamicArray source, DynamicArray target) {
-        for (int i = 0; i < source.getSize(); i++) {
-            String word = source.getWord(i);
-            int importance = source.getImportance(i);
-
-            // Check if word already exists in the target array
-            boolean exists = false;
-            for (int j = 0; j < target.getSize(); j++) {
-                if (target.getWord(j).equals(word)) {
-                    exists = true;
-                    break;
+    public void importanceUpdate(File wordsFile) {
+        try (Scanner scanner = new Scanner(wordsFile)) {
+            while (scanner.hasNextLine()) {
+                String word = scanner.nextLine().trim().toLowerCase();
+                if (!word.isEmpty()) {
+                    TrieNode node = searchNode(word, root, 0);
+                    if (node != null && node.wordLength > 0) {
+                        node.importance++; // Increment importance for the word
+                    }
                 }
             }
-
-            // Add the word only if it doesn't already exist
-            if (!exists) {
-                target.add(word, importance);
-            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Error: File not found - " + wordsFile.getName());
+        } catch (Exception e) {
+            System.out.println("Error processing file: " + e.getMessage());
         }
     }
 
-    public MinHeap findTopKWords(String word, int k) {
-        // Perform searches for the three criteria
-        DynamicArray prefixResults = searchByPrefix(word);
-        DynamicArray exactLengthResults = searchByExactLength(word.length());
-        DynamicArray approximateResults = approximateLengthSearch(word);
-
-        // Combine results into a single DynamicArray without duplicates
-        DynamicArray combinedResults = new DynamicArray();
-        mergeResults(prefixResults, combinedResults);
-        mergeResults(exactLengthResults, combinedResults);
-        mergeResults(approximateResults, combinedResults);
-
-        // Use a MinHeap to store the top k words
-        MinHeap heap = new MinHeap(k);
-        for (int i = 0; i < combinedResults.getSize(); i++) {
-            String currentWord = combinedResults.getWord(i);
-            int importance = combinedResults.getImportance(i);
-            heap.insert(currentWord, importance); // Insert into the heap
+    private TrieNode searchNode(String word, TrieNode node, int index) {
+        if (node == null || index == word.length()) {
+            return node;
         }
 
-        return heap; // Return the MinHeap containing the top k words
+        char c = word.charAt(index);
+        TrieNode child = node.children.search(c);
+        return searchNode(word, child, index + 1);
     }
-
 
     public static void main(String[] args) {
         if (args.length < 2) {
@@ -585,5 +455,4 @@ public class TrieApp {
 
         input.close();
     }
-
 }
