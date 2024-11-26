@@ -432,8 +432,9 @@ public class TrieApp {
         }
     }
 
-    // Helper method to process each word based on the given rules
     private String processWord(String word) {
+        word = word.toLowerCase(); // Ensure all words are in lowercase
+
         if (word.matches(".*[a-zA-Z][^a-zA-Z]+[a-zA-Z].*")) {
             // Rule 1: Discard words with special characters interspersed with letters
             return null;
@@ -450,6 +451,7 @@ public class TrieApp {
     }
 
 
+
     private TrieNode searchNode(String word, TrieNode node, int index) {
         if (node == null || index == word.length()) {
             return node;
@@ -459,6 +461,7 @@ public class TrieApp {
         TrieNode child = node.children.search(c);
         return searchNode(word, child, index + 1);
     }
+    
 
     public static void main(String[] args) {
         if (args.length < 2) {
@@ -468,11 +471,12 @@ public class TrieApp {
 
         String dictionaryFilePath = args[0];
         String wordsFilePath = args[1];
-        
+
         TrieApp trie = new TrieApp();
 
         trie.loadFile(dictionaryFilePath); // Load dictionary
         trie.importanceUpdate(new File(wordsFilePath)); // Update importance
+
 
         Scanner input = new Scanner(System.in);
 
@@ -499,4 +503,5 @@ public class TrieApp {
 
         input.close();
     }
+
 }
