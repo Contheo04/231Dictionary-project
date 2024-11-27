@@ -1,4 +1,4 @@
-package test3;
+//package test3;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -142,14 +142,9 @@ public class Trie {
         Trie trie = new Trie();
 
         // Load dictionary file into Trie
-        trie.loadFile("dictionary.txt");
-
-        // Print words and their importance
-        System.out.println("\nWords in Trie:");
-        trie.printWords();
+        trie.loadFile("dictionary6.txt");
 
         // Memory calculation
-        System.out.println("\nTotal words found in dictionary: " + numOfWords);
         System.out.println("Memory used by Trie: " + trie.calcMem() + " bytes");
     }
 }

@@ -1,4 +1,4 @@
-package test3;
+//package test3;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -29,7 +29,7 @@ public class randomWordGenerator {
     }
 
     public static void main(String[] args) {
-        int dictionarySize = 1000; // Number of words in dictionary.txt
+        int dictionarySize = 500000; // Number of words in dictionary.txt
 
         // Adjusted parameters for log-normal distribution
         double muMin = 1.0; // Minimum average word length (~3 letters)  #Just a suggestion (I think 3 letters is a correct estimation)
@@ -37,7 +37,7 @@ public class randomWordGenerator {
         double sigmaMin = 0.2; // Minimum variability #changed those 2 based on the before inits
         double sigmaMax = 0.6; // Maximum variability
 
-        try (BufferedWriter dictionaryWriter = new BufferedWriter(new FileWriter("dictionary.txt"))) {
+        try (BufferedWriter dictionaryWriter = new BufferedWriter(new FileWriter("dictionary6.txt"))) {
             // Generate dictionary.txt with variable parameters
             for (int i = 0; i < dictionarySize; i++) {
                 double mu = muMin + (muMax - muMin) * random.nextDouble(); // Randomly pick mu
