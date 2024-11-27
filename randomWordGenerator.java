@@ -1,5 +1,3 @@
-//package test3;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -29,28 +27,48 @@ public class randomWordGenerator {
     }
 
     public static void main(String[] args) {
-        int dictionarySize = 500000; // Number of words in dictionary.txt
+        // Sizes for each dictionary file
+        int[] dictionarySizes = { 1000, 5000, 10000, 100000, 300000, 500000 };
+        int[] Nsize = { 3, 5, 8, 10, 15, 20 };
 
-        // Adjusted parameters for log-normal distribution
-        double muMin = 1.0; // Minimum average word length (~3 letters)  #Just a suggestion (I think 3 letters is a correct estimation)
-        double muMax = 3.4; // Maximum average word length (~30 letters) #Just a suggestion (I think 20 letters is a but max estimation)
-        double sigmaMin = 0.2; // Minimum variability #changed those 2 based on the before inits
+        // Flag for word generation type (0 = log-normal, 1 = fixed length)
+        int flag = 1; // Change to 0 for log-normal generation
+
+        // Parameters for log-normal distribution
+        double muMin = 1.0; // Minimum average word length (~3 letters)
+        double muMax = 3.4; // Maximum average word length (~30 letters)
+        double sigmaMin = 0.2; // Minimum variability
         double sigmaMax = 0.6; // Maximum variability
 
-        try (BufferedWriter dictionaryWriter = new BufferedWriter(new FileWriter("dictionary6.txt"))) {
-            // Generate dictionary.txt with variable parameters
-            for (int i = 0; i < dictionarySize; i++) {
-                double mu = muMin + (muMax - muMin) * random.nextDouble(); // Randomly pick mu
-                double sigma = sigmaMin + (sigmaMax - sigmaMin) * random.nextDouble(); // Randomly pick sigma
-                String word = generateWordWithLogNormalLength(mu, sigma);
-                dictionaryWriter.write(word);
-                dictionaryWriter.newLine();
+        for (int i = 0; i < dictionarySizes.length; i++) {
+            int dictionarySize = dictionarySizes[i];
+            String fileName = "dictionary" + (i + 1) + ".txt";
+
+            try (BufferedWriter dictionaryWriter = new BufferedWriter(new FileWriter(fileName))) {
+
+                // Generate words for the current dictionary size
+                for (int j = 0; j < dictionarySize; j++) {
+                    String word;
+
+                    if (flag == 0) { // Log-normal distribution
+                        double mu = muMin + (muMax - muMin) * random.nextDouble(); // Randomly pick mu
+                        double sigma = sigmaMin + (sigmaMax - sigmaMin) * random.nextDouble(); // Randomly pick sigma
+                        word = generateWordWithLogNormalLength(mu, sigma);
+                    } else if (flag == 1) { // Fixed length
+                        word = generateWordOfLengthN(Nsize[i]);
+                    } else {
+                        throw new IllegalArgumentException("Invalid flag value: " + flag);
+                    }
+
+                    dictionaryWriter.write(word);
+                    dictionaryWriter.newLine();
+                }
+
+                System.out.println(fileName + " created successfully!");
+
+            } catch (IOException e) {
+                System.err.println("Error writing to file " + fileName + ": " + e.getMessage());
             }
-
-            System.out.println("dictionary.txt created successfully!");
-
-        } catch (IOException e) {
-            System.err.println("Error writing to file: " + e.getMessage());
         }
     }
 }

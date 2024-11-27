@@ -130,7 +130,7 @@ public class Trie {
         }
 
         int memory = 26 * 8; // Size of children array (26 pointers, assuming 4 bytes each)
-        memory += 4 + 4 + 4; // Sizes of wordLength, importance, and other metadata
+        memory += 4 + 4 + 4; // Sizes of wordLength, importance, and extra 
         for (TrieNode child : node.children) {
             memory += calcMem(child);
         }
@@ -139,12 +139,25 @@ public class Trie {
     }
 
     public static void main(String[] args) {
-        Trie trie = new Trie();
-
-        // Load dictionary file into Trie
-        trie.loadFile("dictionary6.txt");
-
-        // Memory calculation
-        System.out.println("Memory used by Trie: " + trie.calcMem() + " bytes");
+        String[] dictionaryFiles = {
+            "dictionary1.txt",
+            "dictionary2.txt",
+            "dictionary3.txt",
+            "dictionary4.txt",
+            "dictionary5.txt",
+            "dictionary6.txt"
+        };
+    
+        for (int i = 0; i < dictionaryFiles.length; i++) {
+            Trie trie = new Trie();
+    
+            // Load dictionary file into Trie
+            String fileName = dictionaryFiles[i];
+            trie.loadFile(fileName);
+    
+            // Memory calculation
+            System.out.println(trie.calcMem());
+        }
     }
+    
 }

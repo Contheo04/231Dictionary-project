@@ -172,20 +172,13 @@ public class TrieHashing {
                     insertRecursively(word, 0); // Insert each word into the Trie
                 }
             }
-            System.out.println("Loaded words from dictionary: " + filePath);
+           // System.out.println("Loaded words from dictionary: " + filePath); debugger :3
         } catch (FileNotFoundException e) {
             System.out.println("Error: File not found - " + filePath);
         } catch (Exception e) {
             System.out.println("Error processing file: " + e.getMessage());
         }
     }
-    /* Just a suggestion
-    public int calcMem() {
-        int rootMemory = 4; // wordLength (4 bytes for root node)
-        rootMemory += calcRobinHoodMem(root.children); // Add memory for RobinHoodHashing at the root level
-        return rootMemory + calcMem(root); // Include recursive memory from all child nodes
-    }*/
-
 
     public int calcMem() {
         return calcMem(root);
@@ -197,12 +190,11 @@ public class TrieHashing {
         }
 
         int memory = 4; // wordLength (4 bytes)
-        memory += calcRobinHoodMem(node.children); // Memory used by the Robin Hood Hashing structure
+        memory += calcRobinHoodMem(node.children); // Memory for Robin Hood Hashing
 
-        for (char c = 'a'; c <= 'z'; c++) {
-            TrieNode child = node.children.search(c);
-            if (child != null) {
-                memory += calcMem(child);
+        for (RobinHoodHashing.Element e : node.children.table) {
+            if (e != null && e.trieNode != null) {
+                memory += calcMem(e.trieNode); // Recursively calculate child node memory
             }
         }
 
@@ -214,50 +206,35 @@ public class TrieHashing {
             return 0;
         }
 
-        int memory = 0;
+        int memory = 12; // Metadata: capacity, size, maxProbeLength
+        memory += robinHoodHashing.capacity * 16; // Estimate for table entries (16 bytes per entry)
 
-        // Memory for the hash table and metadata
-        memory += robinHoodHashing.capacity * 12; // Each entry: 1 char (2 bytes) + 1 TrieNode (8 bytes) + probeLength
-        memory += 12; // RobinHoodHashing metadata (capacity, size, maxProbeLength)
+        for (RobinHoodHashing.Element e : robinHoodHashing.table) {
+            memory += calcElementMem(e); // Memory for each element
+        }
 
         return memory;
     }
-    
-    /* Just a suggestion
-     * (private int calcRobinHoodMem(RobinHoodHashing robinHoodHashing) {
-        if (robinHoodHashing == null || robinHoodHashing.table == null) {
-            return 0;
-        }
 
-        int memory = 0;
-
-        // Memory for metadata
-        memory += 12; // RobinHoodHashing metadata (capacity, size, maxProbeLength)
-
-        // Memory for each non-null entry in the table
-        for (RobinHoodHashing.Element e : robinHoodHashing.table) {
-            if (e != null) {
-                memory += 12; // Each entry: key (2 bytes), TrieNode reference (8 bytes), probeLength (4 bytes)
-                memory += calcMem(e.trieNode); // Recursively add memory for the child TrieNode
-            }
-        }
-
-        return memory;
-    } */
-
+    private int calcElementMem(RobinHoodHashing.Element e) {
+        return e != null ? 2 /* char */ + 4 /* probeLength */ + 8 /* trieNode reference */ : 0;
+    }
 
     public static void main(String[] args) {
-        TrieHashing trieHashing = new TrieHashing();
+        String[] dictionaryFiles = {
+                "dictionary1.txt",
+                "dictionary2.txt",
+                "dictionary3.txt",
+                "dictionary4.txt",
+                "dictionary5.txt",
+                "dictionary6.txt"
+        };
 
-        // Load words into the Trie from a dictionary file
-        trieHashing.loadFile("dictionary.txt");
-
-        // Print all words in the Trie
-        System.out.println("\nWords in Trie:");
-        trieHashing.printWords();
-
-        // Memory usage calculation
-        System.out.println("\nNumber of words loaded: " + numOfWords);
-        System.out.println("Memory used by Trie: " + trieHashing.calcMem() + " bytes");
+        for (String fileName : dictionaryFiles) {
+            TrieHashing trieHashing = new TrieHashing();
+            trieHashing.loadFile(fileName);
+            System.out.println(trieHashing.calcMem());
+        }
     }
+
 }
