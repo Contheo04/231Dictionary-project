@@ -302,8 +302,8 @@ public class TrieApp {
     private void collectWordsByPrefix(TrieNode node, String currentWord, String searchPrefix, MinHeap heap) {
         if (node == null) return;
 
-        // If the current word starts with the search prefix, add it to the heap
-        if (currentWord.startsWith(searchPrefix) && node.wordLength > 0) {
+        // If the current word starts with the search prefix and has a positive importance, add it to the heap
+        if (currentWord.startsWith(searchPrefix) && node.wordLength > 0 && node.importance > 0) {
             heap.insert(currentWord, node.importance);
         }
 
@@ -316,15 +316,16 @@ public class TrieApp {
         }
     }
 
+
     private void collectWordsByExactLength(TrieNode node, String currentWord, int targetLength, MinHeap heap) {
         if (node == null) return;
 
-        // If this is a complete word and its length matches, add it to the heap
-        if (node.wordLength > 0 && currentWord.length() == targetLength) {
+        // Add only if word length matches targetLength and importance > 0
+        if (node.wordLength > 0 && currentWord.length() == targetLength && node.importance > 0) {
             heap.insert(currentWord, node.importance);
         }
 
-        // Traverse all child nodes
+        // Recursively traverse child nodes
         for (char c = 'a'; c <= 'z'; c++) {
             TrieNode child = node.children.search(c);
             if (child != null) {
@@ -332,13 +333,17 @@ public class TrieApp {
             }
         }
     }
-
+    
     private void collectWordsByApproximateLength(TrieNode node, String currentWord, String targetWord, MinHeap heap) {
         if (node == null) return;
 
-        // Check if the current word matches the approximate length criteria
-        int lengthDifference = Math.abs(currentWord.length() - targetWord.length());
-        if (node.wordLength > 0 && lengthDifference <= 2 && isSimilar(currentWord, targetWord)) {
+        // Calculate the length difference
+        int lengthDifference = currentWord.length() - targetWord.length();
+
+        // Allow words with length differences of -1, 0, 1, or 2
+        if (node.wordLength > 0 && node.importance > 0 && 
+            (lengthDifference >= -1 && lengthDifference <= 2) &&
+            areCharactersSimilar(currentWord, targetWord)) {
             heap.insert(currentWord, node.importance);
         }
 
@@ -351,43 +356,37 @@ public class TrieApp {
         }
     }
 
-    private boolean isSimilar(String trieWord, String targetWord) {
-        int len1 = trieWord.length();
-        int len2 = targetWord.length();
+    private boolean areCharactersSimilar(String word1, String word2) {
+        int[] freq1 = new int[30];
+        int[] freq2 = new int[30];
 
-        // Only allow specific length differences
-        if (len1 != len2 - 1 && len1 != len2 && len1 != len2 + 2) {
-            return false;
-        }
-
-        // Check character mismatches
-        int mismatchCount = 0;
-        int i = 0, j = 0;
-
-        while (i < len1 && j < len2) {
-            if (trieWord.charAt(i) != targetWord.charAt(j)) {
-                mismatchCount++;
-                if (mismatchCount > 2) return false; // Allow up to 2 mismatches
-
-                // Adjust indices for added/removed characters
-                if (len1 > len2) {
-                    i++; // Extra character in trieWord
-                } else if (len1 < len2) {
-                    j++; // Extra character in targetWord
-                } else {
-                    i++;
-                    j++;
-                }
-            } else {
-                i++;
-                j++;
+        // Count character frequencies for word1
+        for (char c : word1.toCharArray()) {
+            if (c - 'a' < 30 && c - 'a' >= 0) { // Ensure within bounds
+                freq1[c - 'a']++;
             }
         }
 
-        // Account for any trailing characters
-        mismatchCount += (len1 - i) + (len2 - j);
-        return mismatchCount <= 2;
+        // Count character frequencies for word2
+        for (char c : word2.toCharArray()) {
+            if (c - 'a' < 30 && c - 'a' >= 0) { // Ensure within bounds
+                freq2[c - 'a']++;
+            }
+        }
+
+        int shared = 0, total = 0;
+
+        // Compare frequencies
+        for (int i = 0; i < 30; i++) {
+            shared += Math.min(freq1[i], freq2[i]); // Characters common to both words
+            total += Math.max(freq1[i], freq2[i]); // Total unique characters in both words
+        }
+
+        // Define similarity threshold as at least 50% shared characters
+        double similarityRatio = (double) shared / total;
+        return similarityRatio >= 0.7;
     }
+
 
     public void importanceUpdate(File wordsFile) {
         try {
