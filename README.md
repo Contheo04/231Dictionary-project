@@ -36,4 +36,4 @@ The EPL 231 Dictionary Project is a Java-based application that implements an ef
 ---
 
 ## Closing Thoughts About the Project
-The project was challenging but rewarding. Implementing Robin Hood Hashing in a Trie structure and optimizing memory usage were particularly engaging tasks. Generating realistic test data with log-normal word lengths added a practical touch. Debugging memory calculation methods was tricky but manageable.
+This project got me acting like a vietnam veteran. I'll be getting flashbacks whenever I hear "Robin Hood". 2/10, please never again
