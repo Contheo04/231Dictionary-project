@@ -707,7 +707,179 @@ public class TrieApp {
     	return longestWord;
     }
     */
-
+    
+    /*$$SOLUTION OF EXERCISE 6$$
+    public void printNLengthDecendingly(TrieNode root ,int n) {
+    	if(root == null) {
+    		System.out.println("This is a null Trie");
+    		return;
+    	}
+    	
+    	if(n < 1) {
+    		System.out.println("No such length exists");
+    		return;
+    	}
+    	
+    	int k = findCountOfNLengthWords(root , n );
+    	
+    	MinHeap heap = new MinHeap(k);
+    	
+    	collectNLengthWords(root , heap , n , "");
+    	
+    	if(heap.size == 0) {
+    		System.out.println("No words with such length found");
+    		return;
+    	}
+    	
+    	int iterations = heap.size;
+    	
+    	printRecursively(heap , iterations);
+    	
+    }
+    
+    private void collectNLengthWords(TrieNode node , MinHeap heap , int n , String currentWord) {
+    	if(node == null)
+    		return;
+    	
+    	
+    	if(node.wordLength == n) {
+    		heap.insert(currentWord, node.importance);
+    	}
+    	
+    	for(RobinHoodHashing.Element element : node.children.table)
+    		if(element != null)
+    			collectNLengthWords(element.trieNode , heap , n , currentWord + element.key);
+    	
+    }
+    
+    private int findCountOfNLengthWords(TrieNode node , int n ) {
+    	if(node == null)
+    		return 0;
+    	
+    	int count = 0;
+    	
+    	if(node.wordLength == n)
+    		count++;
+    	
+    	for(RobinHoodHashing.Element element : node.children.table)
+    		if(element != null)
+    			count += findCountOfNLengthWords(element.trieNode , n);
+    
+    	return count;
+    }
+    
+    private void printRecursively(MinHeap heap , int iterations) {
+    	if(iterations == 0)
+    		return;
+    	
+    	String minWord = heap.removeMin();
+    	
+    	printRecursively(heap , iterations - 1);
+    	
+    	System.out.println(minWord);
+    }
+    */
+    
+    /*$$SOLUTION OF EXERCISE 7$$
+    public String shortestWord(TrieNode node , String currentWord) {
+    	if(node == null)
+    		return null;
+    	
+    	String minWord=null;
+    	
+    	if(node.wordLength > 0) {
+    		minWord = currentWord;
+    	}
+    	
+    	for(RobinHoodHashing.Element element : node.children.table) {
+    		if(element != null) {
+    			String minWordChild = shortestWord(element.trieNode , currentWord + element.key);
+    			
+    			if(minWord == null || (minWordChild.length() < minWord.length()))
+    				minWord = minWordChild;
+    		}
+    	}
+    	
+    	return minWord;
+    }
+    */
+    
+    /*$$SOLUTION OF EXERCISE 8
+    public void printWordsWithMinImportance(TrieNode root , int minimum) {
+    	if(root == null) {
+    		System.out.println("Nothing inside trie");
+    		return;
+    	}
+    	
+    	int amount = numOfWordsWithMinimumImportance(root , minimum);
+    	
+    	MinHeap heap = new MinHeap(amount);
+    	
+    	collectWordsWithMinimumImportance(root , heap , minimum , "");
+    	
+    	if(heap.size == 0) {
+    		System.out.println("Not a word with importance equal or greater than minimum");
+    		return;
+    	}
+    	
+    	
+    	printInDescending(heap , heap.size);
+    }
+    
+    private int numOfWordsWithMinimumImportance(TrieNode node ,  int minimum ) {
+    	if(node == null)
+    		return 0;
+    	
+    	int count = 0;
+    	
+    	if(node.wordLength > 0 && node.importance >= minimum)
+    		count++;
+    	
+    	for(RobinHoodHashing.Element element : node.children.table)
+    		if(element != null)
+    			count += numOfWordsWithMinimumImportance(element.trieNode , minimum );
+    	
+    	return count;
+    }
+    
+    private void collectWordsWithMinimumImportance(TrieNode node , MinHeap heap , int minimum , String currentWord) {
+    	if(node == null)
+    		return;
+    	
+    	if(node.wordLength > 0 && node.importance >= minimum)
+    		heap.insert(currentWord, node.importance);
+    	
+    	for(RobinHoodHashing.Element element : node.children.table)
+    		if(element != null)
+    			collectWordsWithMinimumImportance(element.trieNode , heap , minimum , currentWord + element.key);
+    }
+    
+    private void printInDescending(MinHeap heap , int iterations) {
+    	if(iterations == 0)
+    		return;
+    	
+    	String minWord = heap.removeMin();
+    	
+    	printInDescending(heap , iterations - 1);
+    	
+    	System.out.println(minWord);
+    }
+    */
+    
+    /*$$SOLUTION OF EXERCISE 9$$
+    public void printWords(TrieNode node , int min , int max , String currentWord) {
+    	if(node == null)
+    		return;
+    	
+    	if(node.wordLength>0 && node.importance >= min && node.importance <= max)
+    		System.out.println(currentWord);
+    	
+    	for(RobinHoodHashing.Element element : node.children.table)
+    		if(element != null)
+    			printWords(element.trieNode , min , max , currentWord + element.key);
+    }
+    */
+    
     public static void main(String[] args) {
         if (args.length < 2) {
             System.out.println("Usage: java TrieApp <dictionary file> <words file>");
@@ -747,7 +919,24 @@ public class TrieApp {
         String longestWord = trie.actualLongestWord(trie.root, "");
         System.out.println(longestWord);
         */
+        
+        /*$$FOR EXERCISE 6$$
+        trie.printNLengthDecendingly(trie.root, 7);
+        */
        
+        /*$$FOR EXERCISE 7$$
+        String minWord = trie.shortestWord(trie.root, "");
+        System.out.println(minWord);
+        */
+        
+        /*$$FOR EXERCISE 8$$
+        trie.printWordsWithMinImportance(trie.root, 2);
+		*/
+        
+        /*$$FOR EXERCISE 9$$
+        trie.printWords(trie.root, 2, 4, "");
+        */
+        
        //$$REGULAR MAIN$$
        /* Scanner input = new Scanner(System.in);
 
