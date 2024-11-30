@@ -12,17 +12,15 @@ Write a method to calculate the average importance of all complete words in the 
 
 5. Longest Word
 Write a method to find and print the longest word in the Trie.
+
 6. Words of Exact Length
 Write a method to find all words of a given length in the Trie and print them in ascending order of importance.
 
 7. Shortest Word
-Write a method to find and print the shortest word in the Trie. If there are ties, return all words in ascending order of importance.
+Write a method to find and print the shortest word in the Trie. 
 
-8. Most Frequent Prefix
-Implement a method to traverse the Trie and find the prefix that appears in the most words. Return the prefix and the number of words that start with it.
-
-9. Words with a Minimum Importance
+8. Words with a Minimum Importance
 Write a method to find all words with an importance value greater than or equal to a given threshold. Print them in descending order of importance.
 
-10. Words in a Length Range
+9. Words in a Length Range
 Write a method to collect and print all words from the Trie whose lengths fall within a given range `[min, max]`.
