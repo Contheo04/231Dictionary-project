@@ -181,7 +181,7 @@ public class TrieHashing {
             return 0; // Return 0 for null nodes
         }
 
-        int memory = 4; // Memory for wordLength (4 bytes)
+        int memory = 4 + 4; // Memory for wordLength (4 bytes)
         memory += calcRobinHoodMem(node.children); // Calculate memory for Robin Hood Hashing
 
         for (RobinHoodHashing.Element e : node.children.table) {
@@ -199,7 +199,7 @@ public class TrieHashing {
         }
 
         int memory = 12; // Memory for metadata (capacity, size, maxProbeLength)
-        memory += robinHoodHashing.capacity * 16; // Estimate for table entries (16 bytes per entry)
+        memory += robinHoodHashing.size * 16; // Estimate for table entries (16 bytes per entry)
 
         for (RobinHoodHashing.Element e : robinHoodHashing.table) {
             memory += calcElementMem(e); // Add memory for each element
