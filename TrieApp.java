@@ -1,4 +1,4 @@
-//package test3;
+package test3;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -393,37 +393,39 @@ public class TrieApp {
         }
     }
 
-    // Determines whether two words have similar character distributions
     private boolean areCharactersSimilar(String word1, String word2) {
-        int[] freq1 = new int[30]; // Frequency array for word1
-        int[] freq2 = new int[30]; // Frequency array for word2
+        int maxLength = Math.max(word1.length(), word2.length());
+        int matchingPositions = 0;
+        int tolerance = 1; // Allow a mismatch tolerance of ±1 position
 
-        // Count character frequencies for word1
-        for (char c : word1.toCharArray()) {
-            if (c - 'a' < 30 && c - 'a' >= 0) { // Ensure within valid range
-                freq1[c - 'a']++;
+        // Iterate through the characters of the shorter word
+        for (int i = 0; i < word1.length(); i++) {
+            for (int j = Math.max(0, i - tolerance); j <= Math.min(word2.length() - 1, i + tolerance); j++) {
+                if (word1.charAt(i) == word2.charAt(j)) {
+                    matchingPositions++;
+                    break; // Avoid double-counting this match
+                }
             }
         }
 
-        // Count character frequencies for word2
-        for (char c : word2.toCharArray()) {
-            if (c - 'a' < 30 && c - 'a' >= 0) { // Ensure within valid range
-                freq2[c - 'a']++;
-            }
+        // Adjust threshold based on word length
+        double threshold;
+        if (maxLength <= 6) {
+            threshold = 0.6; // 60% similarity for small words
+        } else if (maxLength <= 10) {
+            threshold = 0.75; // 75% similarity for medium words
+        } else {
+            threshold = 0.90; // 90% similarity for large words
         }
 
-        int shared = 0, total = 0;
+        // Calculate similarity ratio
+        double similarityRatio = (double) matchingPositions / maxLength;
 
-        // Calculate shared and total character counts
-        for (int i = 0; i < 30; i++) {
-            shared += Math.min(freq1[i], freq2[i]); // Shared characters
-            total += Math.max(freq1[i], freq2[i]); // Total unique characters
-        }
-
-        // Determine if similarity ratio meets the threshold (>= 70%)
-        double similarityRatio = (double) shared / total;
-        return similarityRatio >= 0.7;
+        // Return true if similarity ratio meets the threshold
+        return similarityRatio >= threshold;
     }
+
+
 
     // Updates the importance of words in the Trie based on a given file
     public void importanceUpdate(File wordsFile) {
@@ -474,7 +476,10 @@ public class TrieApp {
     private String processWord(String word) {
         word = word.toLowerCase(); // Convert the word to lowercase
 
-        if (word.matches(".*[a-zA-Z][^a-zA-Z]+[a-zA-Z].*")) {
+        if (word.matches("^[^a-zA-Z].*")) {
+            // New Rule: Discard words with special characters at the start
+            return null;
+        } else if (word.matches(".*[a-zA-Z][^a-zA-Z]+[a-zA-Z].*")) {
             // Rule 1: Discard words with special characters interspersed with letters
             return null;
         } else if (word.matches(".*[^a-zA-Z]+$")) {
@@ -487,6 +492,7 @@ public class TrieApp {
             // Default case: Discard anything that doesn't match the above rules
             return null;
         }
+
     }
 
     // Searches for a node in the Trie corresponding to a given word
@@ -499,7 +505,8 @@ public class TrieApp {
         TrieNode child = node.children.search(c); // Search for the child node
         return searchNode(word, child, index + 1); // Recur for the next character
     }
-
+    
+   
     public static void main(String[] args) {
         if (args.length < 2) {
             System.out.println("Usage: java TrieApp <dictionary file> <words file>");
@@ -509,7 +516,7 @@ public class TrieApp {
         TrieApp trie = new TrieApp();
         trie.loadFile(args[0]); // Load dictionary file
         trie.importanceUpdate(new File(args[1])); // Update importance using words file
-
+      
         Scanner input = new Scanner(System.in);
 
         while (true) {
