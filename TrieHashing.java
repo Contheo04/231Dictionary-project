@@ -199,7 +199,6 @@ public class TrieHashing {
         }
 
         int memory = 12; // Memory for metadata (capacity, size, maxProbeLength)
-        memory += robinHoodHashing.capacity * 16; // Estimate for table entries (16 bytes per entry)
 
         for (RobinHoodHashing.Element e : robinHoodHashing.table) {
             memory += calcElementMem(e); // Add memory for each element
